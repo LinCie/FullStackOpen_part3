@@ -79,6 +79,16 @@ app.post("/api/persons", (request, response) => {
     });
   }
 
+  if (
+    numbers.some(
+      (number) => number.name.toLowerCase() === body.name.toLowerCase()
+    )
+  ) {
+    return response.status(400).json({
+      error: "Name must be unique",
+    });
+  }
+
   const number = {
     id: userId,
     name: body.name,
