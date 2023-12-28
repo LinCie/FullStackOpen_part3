@@ -44,12 +44,8 @@ app.get("/info", (request, response) => {
 });
 
 app.get("/api/persons/:id", (request, response) => {
-  console.log("test");
   const userId = Number(request.params.id);
-  console.log(userId);
-
   const user = numbers.find((number) => number.id === userId);
-  console.log(user);
 
   if (user) {
     response.json(user);
