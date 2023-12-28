@@ -1,6 +1,8 @@
 const express = require("express");
 const app = express();
 
+app.use(express.json());
+
 let numbers = [
   {
     id: 1,
@@ -52,6 +54,39 @@ app.get("/api/persons/:id", (request, response) => {
   } else {
     response.status(404).end();
   }
+});
+
+const getId = () => {
+  const generatedid = Math.floor(Math.random() * 100000);
+  if (numbers.some((number) => number.id === generatedid)) {
+    return getId();
+  } else {
+    return generatedid;
+  }
+};
+
+app.post("/api/persons", (request, response) => {
+  const userId = getId();
+  const body = request.body;
+
+  if (!body.name) {
+    return response.status(400).json({
+      error: "Name missing",
+    });
+  } else if (!body.number) {
+    return response.status(400).json({
+      error: "Number missing",
+    });
+  }
+
+  const number = {
+    id: userId,
+    name: body.name,
+    number: body.number,
+  };
+
+  numbers = numbers.concat(number);
+  response.status(201).json(number);
 });
 
 app.delete("/api/persons/:id", (request, response) => {
