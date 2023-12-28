@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
 
-const notes = [
+const numbers = [
   {
     id: 1,
     name: "Arto Hellas",
@@ -25,11 +25,11 @@ const notes = [
 ];
 
 app.get("/api/persons", (request, response) => {
-  response.json(notes);
+  response.json(numbers);
 });
 
 app.get("/info", (request, response) => {
-  const entries = notes.length;
+  const entries = numbers.length;
 
   const today = new Date();
   const date =
@@ -41,6 +41,21 @@ app.get("/info", (request, response) => {
   response.send(
     `<p>The phonebook currently has ${entries} entries</p><p>${dateTime}</p>`
   );
+});
+
+app.get("/api/persons/:id", (request, response) => {
+  console.log("test");
+  const userId = Number(request.params.id);
+  console.log(userId);
+
+  const user = numbers.find((number) => number.id === userId);
+  console.log(user);
+
+  if (user) {
+    response.json(user);
+  } else {
+    response.status(404).end();
+  }
 });
 
 const PORT = 3001;
