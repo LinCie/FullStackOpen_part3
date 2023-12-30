@@ -1,0 +1,1 @@
+:root{--color-success: #34dd5e;--color-error: #db3a3a}.message{padding:.5rem;margin:1rem;border-width:2px;border-radius:5px;font-size:1rem;font-weight:700;border-style:solid}.success{border-color:var(--color-success);color:var(--color-success)}.error{border-color:var(--color-error);color:var(--color-error)}
