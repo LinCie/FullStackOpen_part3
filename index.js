@@ -1,6 +1,50 @@
+require("dotenv").config();
+
 const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
+const mongoose = require("mongoose");
+const PhoneNumber = require("./models/PhoneNumber");
+
+mongoose.set("strictQuery", false);
+
+const connect = async () => {
+  try {
+    await mongoose.connect(process.env.MONGODB_URI);
+    console.log("Connected to MongoDB");
+  } catch (err) {
+    console.log("Error connecting to MongoDB", err);
+  }
+};
+connect();
+
+const getNumbers = async () => {
+  try {
+    const response = await PhoneNumber.find({});
+    return response;
+  } catch (err) {
+    console.log("Could not get the numbers", err);
+  }
+};
+
+const countEntries = async () => {
+  try {
+    const response = await PhoneNumber.countDocuments({});
+    return response;
+  } catch (err) {
+    console.log("Could not count the entries", err);
+  }
+};
+
+const getIndividual = async (userId) => {
+  try {
+    const response = await PhoneNumber.findById(userId);
+    return response;
+  } catch (err) {
+    console.log("Could not get the individual number", err);
+  }
+};
+
 const app = express();
 
 morgan.token("reqbody", (req, res) => {
@@ -9,7 +53,7 @@ morgan.token("reqbody", (req, res) => {
 
 app.use(express.json());
 app.use(cors());
-app.use(express.static('dist'))
+app.use(express.static("dist"));
 app.use(
   morgan(
     ":method :url :status :res[content-length] - :response-time ms :reqbody"
@@ -39,33 +83,50 @@ let numbers = [
   },
 ];
 
-app.get("/api/persons", (request, response) => {
-  response.json(numbers);
+app.get("/api/persons", async (request, response) => {
+  try {
+    const number = await getNumbers();
+    response.json(number);
+  } catch (err) {
+    console.log("Error getting numbers", err);
+  }
 });
 
-app.get("/info", (request, response) => {
-  const entries = numbers.length;
+app.get("/info", async (request, response) => {
+  try {
+    const entries = await countEntries();
 
-  const today = new Date();
-  const date =
-    today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate();
-  const time =
-    today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-  const dateTime = date + " " + time;
+    const today = new Date();
+    const date =
+      today.getFullYear() +
+      "-" +
+      (today.getMonth() + 1) +
+      "-" +
+      today.getDate();
+    const time =
+      today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+    const dateTime = date + " " + time;
 
-  response.send(
-    `<p>The phonebook currently has ${entries} entries</p><p>${dateTime}</p>`
-  );
+    response.send(
+      `<p>The phonebook currently has ${entries} entries</p><p>${dateTime}</p>`
+    );
+  } catch (err) {
+    console.log("Error getting numbers", err);
+  }
 });
 
-app.get("/api/persons/:id", (request, response) => {
-  const userId = Number(request.params.id);
-  const user = numbers.find((number) => number.id === userId);
+app.get("/api/persons/:id", async (request, response) => {
+  const individualId = request.params.id;
 
-  if (user) {
-    response.json(user);
-  } else {
-    response.status(404).end();
+  try {
+    const individual = await getIndividual(individualId);
+    if (individual) {
+      response.json(individual);
+    } else {
+      response.status(404).end();
+    }
+  } catch (err) {
+    console.log("Error getting individual", err);
   }
 });
 
@@ -119,7 +180,7 @@ app.delete("/api/persons/:id", (request, response) => {
   response.status(204).end();
 });
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
