@@ -45,6 +45,14 @@ const getIndividual = async (userId) => {
   }
 };
 
+const deleteIndividual = async (userId) => {
+  try {
+    await PhoneNumber.findByIdAndDelete(userId);
+  } catch (err) {
+    console.log("Can't delete individual", err);
+  }
+};
+
 const app = express();
 
 morgan.token("reqbody", (req, res) => {
@@ -130,17 +138,7 @@ app.get("/api/persons/:id", async (request, response) => {
   }
 });
 
-const getId = () => {
-  const generatedid = Math.floor(Math.random() * 100000);
-  if (numbers.some((number) => number.id === generatedid)) {
-    return getId();
-  } else {
-    return generatedid;
-  }
-};
-
-app.post("/api/persons", (request, response) => {
-  const userId = getId();
+app.post("/api/persons", async (request, response) => {
   const body = request.body;
 
   if (!body.name) {
@@ -153,31 +151,28 @@ app.post("/api/persons", (request, response) => {
     });
   }
 
-  if (
-    numbers.some(
-      (number) => number.name.toLowerCase() === body.name.toLowerCase()
-    )
-  ) {
-    return response.status(400).json({
-      error: "Name must be unique",
-    });
-  }
-
-  const number = {
-    id: userId,
+  const number = new PhoneNumber({
     name: body.name,
     number: body.number,
-  };
+  });
 
-  numbers = numbers.concat(number);
-  response.status(201).json(number);
+  try {
+    await number.save();
+    response.status(201).json(number);
+  } catch (err) {
+    console.log("Error adding number", err);
+  }
 });
 
-app.delete("/api/persons/:id", (request, response) => {
-  const userId = Number(request.params.id);
-  numbers = numbers.filter((number) => number.id !== userId);
+app.delete("/api/persons/:id", async (request, response) => {
+  const userId = request.params.id;
 
-  response.status(204).end();
+  try {
+    await deleteIndividual(userId);
+    response.status(204).end();
+  } catch (err) {
+    console.log("Failed to delete", err);
+  }
 });
 
 const PORT = process.env.PORT;
