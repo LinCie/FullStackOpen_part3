@@ -9,25 +9,18 @@ const password = process.argv[2];
 const name = process.argv[3];
 const phone = process.argv[4];
 
-const getId = () => {
-  const generatedid = Math.floor(Math.random() * 1000000);
-  return generatedid;
-};
-
 const url = `mongodb+srv://FullStackOpen:${password}@fullstackopen.ueewslx.mongodb.net/?retryWrites=true&w=majority`;
 
 mongoose.set("strictQuery", false);
 
-const numberSchema = new mongoose.Schema({
-  id: Number,
+const phoneNumberSchema = new mongoose.Schema({
   name: String,
   number: String,
 });
 
-const PhoneNumber = mongoose.model("PhoneNumber", numberSchema);
+const PhoneNumber = mongoose.model("Phone Number", phoneNumberSchema);
 
 const phoneNumber = new PhoneNumber({
-  id: getId(),
   name: name,
   number: phone,
 });
