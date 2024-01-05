@@ -4,7 +4,13 @@ const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
 const mongoose = require("mongoose");
-const PhoneNumber = require("./models/PhoneNumber");
+const {
+  PhoneNumber,
+  getNumbers,
+  countEntries,
+  getIndividual,
+  deleteIndividual,
+} = require("./models/PhoneNumber");
 
 mongoose.set("strictQuery", false);
 
@@ -17,41 +23,6 @@ const connect = async () => {
   }
 };
 connect();
-
-const getNumbers = async () => {
-  try {
-    const response = await PhoneNumber.find({});
-    return response;
-  } catch (err) {
-    console.log("Could not get the numbers", err);
-  }
-};
-
-const countEntries = async () => {
-  try {
-    const response = await PhoneNumber.countDocuments({});
-    return response;
-  } catch (err) {
-    console.log("Could not count the entries", err);
-  }
-};
-
-const getIndividual = async (userId) => {
-  try {
-    const response = await PhoneNumber.findById(userId);
-    return response;
-  } catch (err) {
-    console.log("Could not get the individual number", err);
-  }
-};
-
-const deleteIndividual = async (userId) => {
-  try {
-    await PhoneNumber.findByIdAndDelete(userId);
-  } catch (err) {
-    console.log("Can't delete individual", err);
-  }
-};
 
 const app = express();
 
@@ -68,29 +39,7 @@ app.use(
   )
 );
 
-let numbers = [
-  {
-    id: 1,
-    name: "Arto Hellas",
-    number: "040-123456",
-  },
-  {
-    id: 2,
-    name: "Ada Lovelace",
-    number: "39-44-5323523",
-  },
-  {
-    id: 3,
-    name: "Dan Abramov",
-    number: "12-43-234345",
-  },
-  {
-    id: 4,
-    name: "Mary Poppendieck",
-    number: "39-23-6423122",
-  },
-];
-
+// Get the whole numbers
 app.get("/api/persons", async (request, response) => {
   try {
     const number = await getNumbers();
@@ -100,6 +49,7 @@ app.get("/api/persons", async (request, response) => {
   }
 });
 
+// Get the numbers of entires and the access date
 app.get("/info", async (request, response) => {
   try {
     const entries = await countEntries();
@@ -123,6 +73,7 @@ app.get("/info", async (request, response) => {
   }
 });
 
+// Get individual number
 app.get("/api/persons/:id", async (request, response) => {
   const individualId = request.params.id;
 
@@ -138,6 +89,7 @@ app.get("/api/persons/:id", async (request, response) => {
   }
 });
 
+// Add new number
 app.post("/api/persons", async (request, response) => {
   const body = request.body;
 
@@ -164,7 +116,7 @@ app.post("/api/persons", async (request, response) => {
   }
 });
 
-// Exercise 3.15
+// Delete selected number
 app.delete("/api/persons/:id", async (request, response) => {
   const userId = request.params.id;
 
