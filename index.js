@@ -40,17 +40,17 @@ app.use(
 );
 
 // Get the whole numbers
-app.get("/api/persons", async (request, response) => {
+app.get("/api/persons", async (request, response, next) => {
   try {
     const number = await getNumbers();
     response.json(number);
   } catch (err) {
-    console.log("Error getting numbers", err);
+    next(err);
   }
 });
 
 // Get the numbers of entires and the access date
-app.get("/info", async (request, response) => {
+app.get("/info", async (request, response, next) => {
   try {
     const entries = await countEntries();
 
@@ -69,12 +69,12 @@ app.get("/info", async (request, response) => {
       `<p>The phonebook currently has ${entries} entries</p><p>${dateTime}</p>`
     );
   } catch (err) {
-    console.log("Error getting numbers", err);
+    next(err);
   }
 });
 
 // Get individual number
-app.get("/api/persons/:id", async (request, response) => {
+app.get("/api/persons/:id", async (request, response, next) => {
   const individualId = request.params.id;
 
   try {
@@ -85,12 +85,12 @@ app.get("/api/persons/:id", async (request, response) => {
       response.status(404).end();
     }
   } catch (err) {
-    console.log("Error getting individual", err);
+    next(err);
   }
 });
 
 // Add new number
-app.post("/api/persons", async (request, response) => {
+app.post("/api/persons", async (request, response, next) => {
   const body = request.body;
 
   if (!body.name) {
@@ -112,21 +112,40 @@ app.post("/api/persons", async (request, response) => {
     await number.save();
     response.status(201).json(number);
   } catch (err) {
-    console.log("Error adding number", err);
+    next(err);
   }
 });
 
 // Delete selected number
-app.delete("/api/persons/:id", async (request, response) => {
+app.delete("/api/persons/:id", async (request, response, next) => {
   const userId = request.params.id;
 
   try {
     await deleteIndividual(userId);
     response.status(204).end();
   } catch (err) {
-    console.log("Failed to delete", err);
+    next(err);
   }
 });
+
+const unknownEndpoint = (request, response) => {
+  response.status(404).send({ error: "unknown endpoint" });
+};
+
+// handler of requests with unknown endpoint
+app.use(unknownEndpoint);
+
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message);
+
+  if (error.name === "CastError") {
+    return response.status(400).send({ error: "malformatted id" });
+  }
+
+  next(error);
+};
+
+app.use(errorHandler);
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => {
