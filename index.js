@@ -10,6 +10,7 @@ const {
   countEntries,
   getIndividual,
   deleteIndividual,
+  updateIndividual,
 } = require("./models/PhoneNumber");
 
 mongoose.set("strictQuery", false);
@@ -111,6 +112,34 @@ app.post("/api/persons", async (request, response, next) => {
   try {
     await number.save();
     response.status(201).json(number);
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Update number
+app.put("/api/persons/:id", async (request, response, next) => {
+  const individualId = request.params.id;
+  const body = request.body;
+
+  if (!body.name) {
+    return response.status(400).json({
+      error: "Name missing",
+    });
+  } else if (!body.number) {
+    return response.status(400).json({
+      error: "Number missing",
+    });
+  }
+
+  const number = {
+    name: body.name,
+    number: body.number,
+  };
+
+  try {
+    const newNumber = await updateIndividual(individualId, number);
+    response.status(201).json(newNumber);
   } catch (err) {
     next(err);
   }

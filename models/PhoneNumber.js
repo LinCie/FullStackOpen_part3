@@ -50,10 +50,22 @@ const deleteIndividual = async (userId) => {
   }
 };
 
+const updateIndividual = async (userId, number) => {
+  try {
+    const response = await PhoneNumber.findByIdAndUpdate(userId, number, {
+      new: true,
+    });
+    return response;
+  } catch (err) {
+    throw err;
+  }
+};
+
 module.exports = {
   PhoneNumber,
   getNumbers,
   countEntries,
   getIndividual,
   deleteIndividual,
+  updateIndividual,
 };
