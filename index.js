@@ -164,6 +164,7 @@ app.post("/api/persons", async (request, response) => {
   }
 });
 
+// Exercise 3.15
 app.delete("/api/persons/:id", async (request, response) => {
   const userId = request.params.id;
 
