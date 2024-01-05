@@ -75,6 +75,7 @@ app.get("/info", async (request, response, next) => {
 });
 
 // Get individual number
+// Exercise 3.18
 app.get("/api/persons/:id", async (request, response, next) => {
   const individualId = request.params.id;
 
