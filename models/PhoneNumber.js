@@ -1,7 +1,11 @@
 const mongoose = require("mongoose");
 
 const phoneNumberSchema = new mongoose.Schema({
-  name: String,
+  name: {
+    type: String,
+    minLength: 3,
+    required: true,
+  },
   number: String,
 });
 
@@ -54,6 +58,8 @@ const updateIndividual = async (userId, number) => {
   try {
     const response = await PhoneNumber.findByIdAndUpdate(userId, number, {
       new: true,
+      runValidators: true,
+      context: "query",
     });
     return response;
   } catch (err) {
