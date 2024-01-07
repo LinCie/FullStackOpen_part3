@@ -11,7 +11,7 @@ const phoneNumberSchema = new mongoose.Schema({
     minLength: 8,
     validate: {
       validator: (n) => {
-        return /\d{2,3}\-\d+/.test(n);
+        return /\d{2,3}-\d+/.test(n);
       },
       message: (props) => `${props.value} is not a valid phone number!`,
     },
@@ -29,52 +29,28 @@ phoneNumberSchema.set("toJSON", {
 
 const PhoneNumber = mongoose.model("Phone Number", phoneNumberSchema);
 
-const getNumbers = async () => {
-  try {
-    const response = await PhoneNumber.find({});
-    return response;
-  } catch (err) {
-    throw err;
-  }
+const getNumbers = () => {
+  return PhoneNumber.find({});
 };
 
-const countEntries = async () => {
-  try {
-    const response = await PhoneNumber.countDocuments({});
-    return response;
-  } catch (err) {
-    throw err;
-  }
+const countEntries = () => {
+  return PhoneNumber.countDocuments({});
 };
 
-const getIndividual = async (userId) => {
-  try {
-    const response = await PhoneNumber.findById(userId);
-    return response;
-  } catch (err) {
-    throw err;
-  }
+const getIndividual = (userId) => {
+  return PhoneNumber.findById(userId);
 };
 
-const deleteIndividual = async (userId) => {
-  try {
-    await PhoneNumber.findByIdAndDelete(userId);
-  } catch (err) {
-    throw err;
-  }
+const deleteIndividual = (userId) => {
+  return PhoneNumber.findByIdAndDelete(userId);
 };
 
-const updateIndividual = async (userId, number) => {
-  try {
-    const response = await PhoneNumber.findByIdAndUpdate(userId, number, {
-      new: true,
-      runValidators: true,
-      context: "query",
-    });
-    return response;
-  } catch (err) {
-    throw err;
-  }
+const updateIndividual = (userId, number) => {
+  return PhoneNumber.findByIdAndUpdate(userId, number, {
+    new: true,
+    runValidators: true,
+    context: "query",
+  });
 };
 
 module.exports = {

@@ -36,8 +36,8 @@ app.use(cors());
 app.use(express.static("dist"));
 app.use(
   morgan(
-    ":method :url :status :res[content-length] - :response-time ms :reqbody"
-  )
+    ":method :url :status :res[content-length] - :response-time ms :reqbody",
+  ),
 );
 
 // Get the whole numbers
@@ -67,7 +67,7 @@ app.get("/info", async (request, response, next) => {
     const dateTime = date + " " + time;
 
     response.send(
-      `<p>The phonebook currently has ${entries} entries</p><p>${dateTime}</p>`
+      `<p>The phonebook currently has ${entries} entries</p><p>${dateTime}</p>`,
     );
   } catch (err) {
     next(err);
