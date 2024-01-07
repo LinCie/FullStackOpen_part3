@@ -177,6 +177,8 @@ const errorHandler = (error, request, response, next) => {
   next(error);
 };
 
+// Exercise 3.21 already done
+
 app.use(errorHandler);
 
 const PORT = process.env.PORT;
